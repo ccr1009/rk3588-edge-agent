@@ -159,10 +159,18 @@ mkdir -p /root/rkllm_deploy /root/lab /root/patrol /root/asr \
 
 ## 5. 编译（按依赖从少到多）
 
+> **没有板子、或者板子暂时不在手边？** 先跑 `bash build/check_syntax.sh`。
+> 它用 `build/check_stubs/` 里的桩头文件，在**任何 PC 上**检查全部 5 个主程序的
+> 语法与类型，不需要板子、不需要 SDK、不需要 opencv。能抓「改了字段名没改全」
+> 「API 名字写错」这类错。**但它不能证明板端能跑** —— 桩头文件没有真实现。
+
 ```bash
 cd <仓库根>
 
-# ① 零外部依赖，先编这两个确认工具链正常
+# ⓪ 无板子可用的编译检查
+bash build/check_syntax.sh
+
+# ① 零外部依赖，先编这三个确认工具链正常
 bash build/build_agent_server.sh        # → edgevision_agent_server（8088 控制面）
 bash build/build_patrol_daemon.sh       # → edgevision_patrol_daemon（巡检守护）
 bash build/build_voice_gateway.sh       # → voice_gateway（语音编排）
@@ -302,7 +310,41 @@ bash tests/test_e2e.sh        # 端到端：板子说给自己听
 
 ---
 
-## 9. 一句话总结
+## 9. 只有一块板子，怎么验证「别人也能装」
+
+**不需要第二块板子。** 所有脚本的路径都可配（`DEPLOY=` / `OUT=` / `SHERPA_ROOT=`），
+所以可以在**同一块板子的另一个目录**里做一次完整冷启动，完全不碰现有部署：
+
+```bash
+# 在板子上建一个干净的测试根目录
+export T=/root/repro_test
+mkdir -p $T
+
+# 把所有东西都往这里装，不碰 /root/rkllm_deploy 和 /root/lab
+OUT=$T DEPLOY=$T bash build/bootstrap.sh
+
+# 模型和 runtime 可以软链接过来（不占额外空间）
+ln -sf /root/rkllm_deploy/librkllmrt.so $T/
+ln -sf /root/rkllm_deploy/rkllm.h      $T/
+ln -sf /root/rkllm_deploy/*.rkllm      $T/
+
+# 用测试目录的模型跑一次，证明脚本链路是通的
+cd $T && ./rkllm_embodied_agent
+```
+
+这就是一次真实的「干净安装」验证。**只有在 `/root/repro_test` 里能跑通，
+才说明别人照 REPRODUCE.md 也能跑通。** 现在直接跑 `/root/rkllm_deploy` 的东西
+证明不了这一点 —— 那里面有你手调过的历史状态。
+
+清掉测试目录不会有任何影响：
+
+```bash
+rm -rf /root/repro_test
+```
+
+---
+
+## 10. 一句话总结
 
 **路径 ① 的门槛只有两样：`librkllmrt.so` + `.rkllm` 模型。**
 拿到这两样，`build/build_embodied_agent.sh` 编完就能对话了，

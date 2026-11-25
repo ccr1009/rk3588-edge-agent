@@ -135,6 +135,7 @@
 | 文件 | 干什么 |
 | :--- | :--- |
 | `bootstrap.sh` | **从零装到能跑**：建目录 → 检查依赖 → 逐个编译 → 报缺什么 |
+| `check_syntax.sh` | **无板子可用的编译检查**：用 `check_stubs/` 桩头文件检查 5 个主程序的语法与类型 |
 | `deploy.sh` | **一条命令上线**：同步 → 板上编译 → 可选重启。只覆盖 Agent 与语音网关两个源文件 |
 | `build_embodied_agent.sh` | 板上编译 Agent（需 RKLLM SDK） |
 | `build_voice_gateway.sh` | 板上编译语音网关（无外部依赖） |
@@ -158,6 +159,7 @@
 | `include/` | 视觉引擎与后处理的 4 个头文件 | 原 `rk3588-edge-ai/deploy/cpp/include/` |
 | `src/` | 引擎与后处理实现（3 个 .cpp） | 原 `deploy/cpp/src/` |
 | `3rdparty/rknn_api/` | `rknn_api.h` + `librknnrt.so`（7 MB） | 原 `deploy/cpp/3rdparty/` |
+| `build/check_stubs/` | 桩头文件（`rkllm.h`、sherpa `c-api.h`），**只用于无板子时的编译检查，不能上板** | 手写，按真实调用面声明 |
 
 
 ### `drafts/` — 历史实验草稿（31 个，**不要改**）
