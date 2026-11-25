@@ -1,0 +1,49 @@
+# ---- 编译产物：一律不进仓库 ----
+*.o
+*.a
+*.so
+*.so.*
+!3rdparty/rknn_api/lib/librknnrt.so
+
+# 无扩展名的可执行文件（编译输出落在仓库根或 lab 目录）
+/edgevision_agent_server
+/edgevision_patrol_daemon
+/voice_gateway
+/tts_daemon
+/w4_edgevision_gateway
+/w4_edgevision_preview_real
+/rkllm_embodied_agent
+
+# ---- 模型与视频：体积原因不进仓库 ----
+*.rkllm
+*.rknn
+*.onnx
+*.pt
+*.mp4
+*.avi
+
+# ---- 板端回拉的临时副本 ----
+*.from_board
+*.build
+*.bak_*
+*.before_rescue_*
+
+# ---- 一次性调试产物（结论已固化进 docs/） ----
+drafts/_p0_*.sh
+drafts/_p0_*.cpp
+drafts/_p6_*.sh
+drafts/_p6_*.cpp
+agent_test_results/*
+!agent_test_results/README.txt
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+
+# ---- Python 环境 ----
+.venv/
+venv/
